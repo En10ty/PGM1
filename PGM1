@@ -1,0 +1,178 @@
+//Program 1 - Hurricane 
+//Programmer: CS 2020 Cedric Dortch 
+//Class: CS 2020, fall 2021
+//Due Date September 19, 2021
+
+#include <iostream> 
+#include <vector>
+#include <fstream> 
+#include <string>
+#include <iomanip>
+
+const int Max_Elem = 50; //maximum number of elements in a vector. 
+using namespace std;
+
+void Input_Data(vector <string>& vec1, vector <int>& vec2, vector <double>& vec3, int& numElem) { //function used to input data and keep track of the number of hurricanes
+
+	cout << left << fixed << setprecision(1);
+	ifstream infs;
+	numElem = 0;
+
+	//open the file 
+	infs.open("hurr.txt");
+	if (!infs) {
+		cerr << "error" << endl;
+	}
+
+	//getting the data from the file 
+	while (!infs.eof() && numElem < Max_Elem) {
+		getline(infs, vec1.at(numElem));
+		infs >> vec2.at(numElem);
+		infs >> vec3.at(numElem);
+		infs.ignore();
+		numElem++;
+	}
+	infs.close();
+}
+
+//sort all three vectors by city 
+void Bsort(vector<string>& city, vector<int>& wind, vector<double>& rain, int numCities) {
+	int i;
+	int j;
+	string tempCity;
+	int tempWind; 
+	double tempRain; 
+
+	for (i = 1; i < numCities; ++i) {
+		j = i; 
+
+		//swapping the values 
+		while (j > 0 && city.at(j) < city.at(j - 1)) {
+
+			//city swap
+			tempCity = city.at(j);
+			city.at(j) = city.at(j - 1);
+			city.at(j - 1) = tempCity; 
+
+			//wind swap 
+			tempWind = wind.at(j);
+			wind.at(j) = wind.at(j - 1); 
+			wind.at(j - 1) = tempWind; 
+
+			//rain swap 
+			tempRain = rain.at(j); 
+			rain.at(j) = rain.at(j - 1); 
+			rain.at(j - 1) = tempRain; 
+
+			--j; 
+		}
+	}
+}
+
+void PrintVector(vector<string>& city, vector<int>& wind, vector <double>& rain, int& numCities) { //printing the vector
+	cout << "The data file consists of: " << endl; 
+	cout << setw(15) << "City" << setw(10) << "Wind" << setw(10) << " Rain" << endl; 
+	cout << setw(15) << "   " << setw(10) << "   " << setw(10) << "   " << endl;
+
+	for (int count = 0; count < numCities; count++) {
+		cout << setw(15) << city.at(count) << setw(10);
+		cout << wind.at(count) << setw(10);
+		cout << rain.at(count) << endl; 
+	}
+	cout << endl;
+	cout << endl; 
+}
+
+void ViolentWinds(vector<string> city, vector<int> wind, int numCities) { //for violent winds of 120 mph
+	int i = 0; 
+	cout << "The cities with violent winds: " << endl;
+	for (i = 0; i < city.size(); ++i) {
+		if (wind.at(i) >= 120) { 
+			cout << city.at(i) << "   " << wind.at(i) << endl; 
+		}
+	}
+}
+
+void MajorFlood(vector<string> city, vector <double> rain, int numCities) { //for floods where rain is over 3.5
+	int i = 0; 
+	cout << "The Cities with major floods: " << endl;
+	for (i = 0; i < city.size(); ++i) {
+		if (rain.at(i) >= 3.5) {
+			cout << city.at(i) << "   " << rain.at(i) << endl; 
+		}
+	}
+}
+
+//look at the word document to see how to the maximum number 
+int WindiestCities(vector<string> city, vector<int> wind, int numCities) { //find the position of the city of the highest winds 
+	int max_val = wind.at(0);
+	int i; 
+
+	for (i = 0; i < city.size(); ++i) {
+		if (wind.at(i) > max_val) {
+			max_val = wind.at(i); 
+		}
+	}
+	return max_val; 
+	
+} //help????
+
+
+
+double AverageWind(vector<string> city, vector<int> wind, int numCities) {
+	int i = 0;
+	int sum = 0; 
+	double avgWind; 
+
+	for (i = 0; i < numCities; ++i) {
+		sum = wind.at(i) + sum; 
+	}
+
+	avgWind = (sum * 1.0 / numCities); 
+	
+	return avgWind; 
+
+}
+
+double AverageRain(vector<string> city, vector<double> rain, int numCities) {
+	int i = 0;
+	double sum = 0.0;
+	double avgRain; 
+
+	for (i = 0; i < numCities; ++i) {
+		sum = rain.at(i) + sum; 
+	}
+
+	avgRain = sum / numCities; 
+
+	return avgRain; 
+}
+
+int main() {
+	vector<string> cityVect(Max_Elem); //city
+	vector<int> windVect(Max_Elem); //wind
+	vector<double> rainVect(Max_Elem); //rain
+	int numHurricanes = 0; //number of hurricanes in the input file 
+	unsigned int i;
+
+	Input_Data(cityVect, windVect, rainVect, numHurricanes); //calling the input functions 
+	Bsort(cityVect, windVect, rainVect, numHurricanes); 
+	PrintVector(cityVect, windVect, rainVect, numHurricanes); 
+
+
+	ViolentWinds(cityVect, windVect, numHurricanes); 
+	cout << endl;
+	cout << endl; 
+	MajorFlood(cityVect, rainVect, numHurricanes); 
+
+	cout << endl; 
+	//Highest wind 
+	cout << "The highest wind is " << WindiestCities(cityVect, windVect, numHurricanes); 
+	
+	cout << endl; 
+
+	//25 total numbers 
+	cout << "The average wind is " << AverageWind(cityVect,windVect,numHurricanes) << "." << endl; 
+
+	cout << "The average rain fall is " << setprecision(3) << AverageRain(cityVect,rainVect,numHurricanes) << "." << endl; 
+}
